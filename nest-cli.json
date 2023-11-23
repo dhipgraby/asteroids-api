@@ -1,8 +1,32 @@
 {
   "$schema": "https://json.schemastore.org/nest-cli",
   "collection": "@nestjs/schematics",
-  "sourceRoot": "src",
+  "sourceRoot": "apps/asteroids/src",
   "compilerOptions": {
-    "deleteOutDir": true
+    "deleteOutDir": true,
+    "webpack": true,
+    "tsConfigPath": "apps/asteroids/tsconfig.app.json"
+  },
+  "monorepo": true,
+  "root": "apps/asteroids",
+  "projects": {
+    "asteroids": {
+      "type": "application",
+      "root": "apps/asteroids",
+      "entryFile": "main",
+      "sourceRoot": "apps/asteroids/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/asteroids/tsconfig.app.json"
+      }
+    },
+    "login": {
+      "type": "application",
+      "root": "apps/login",
+      "entryFile": "main",
+      "sourceRoot": "apps/login/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/login/tsconfig.app.json"
+      }
+    }
   }
 }
