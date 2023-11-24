@@ -17,7 +17,8 @@ model User {
 
 model Asteroids {
   id Int      @default(autoincrement()) @id
-  diameter Int
+  name String
+  diameter String
   discovered DateTime
   comment String
 }
