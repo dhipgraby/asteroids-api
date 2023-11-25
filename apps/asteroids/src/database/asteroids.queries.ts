@@ -1,7 +1,10 @@
 import { Prisma } from '@prisma/client'
-import { Asteroids } from '@prisma/client';
 import { GetByQueryType } from '../asteroids/dto/queries.dto';
 
+export const getByIdQuery = (id: number) => {
+    const query: Prisma.AsteroidsWhereUniqueInput = { id: Number(id) }
+    return { where: query }
+}
 
 export const getByDateQuery = ({ start_date, end_date, orderBy }: GetByQueryType) => {
 

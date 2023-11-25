@@ -14,18 +14,18 @@ export class AsteroidsController {
 
   @Get('all')
   findAll() {
-    return this.asteroidsService.findAll({});
+    return this.asteroidsService.findAll();
   }
 
   @Get('feed')
   getByDate(@Query(new ValidationPipe({ transform: true, validateCustomDecorators: true })) query: GetByQueryType) {
-    const data: GetByQueryType = query;        
-    return this.asteroidsService.findAll(data);
+    const data: GetByQueryType = query;
+    return this.asteroidsService.getBy(data);
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.asteroidsService.findOne({ id: Number(id) });
+  findOne(@Param('id') id: number) {
+    return this.asteroidsService.findOne(id);
   }
 
 }
