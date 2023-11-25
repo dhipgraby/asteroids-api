@@ -1,0 +1,36 @@
+import { Prisma } from '@prisma/client'
+import { Asteroids } from '@prisma/client';
+import { GetByQueryType } from '../asteroids/dto/queries.dto';
+
+
+export const getByDateQuery = ({ start_date, end_date, orderBy }: GetByQueryType) => {
+
+    const order: Prisma.AsteroidsOrderByWithRelationInput = {
+        discovered: (orderBy ? orderBy : 'asc'),
+    };
+
+    const where: Prisma.AsteroidsWhereInput = {
+        discovered: start_date
+            ? {
+                gte: new Date(start_date),
+            }
+            : undefined,
+
+        ...(end_date
+            ? {
+                discovered: start_date
+                    ? {
+                        lte: new Date(end_date),
+                    }
+                    : {
+                        lt: new Date(end_date),
+                    },
+            }
+            : {}),
+    };
+
+    return {
+        where: where,
+        orderBy: order
+    }
+}

@@ -1,8 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { AsteroidDto } from './dto/create-asteroid.dto';
-import { Prisma, PrismaClient } from '@prisma/client'
+import { Prisma } from '@prisma/client'
 import { PrismaService } from 'lib/common/database/prisma.service';
 import { Asteroids } from '@prisma/client';
+import { getByDateQuery } from '../database/asteroids.queries';
+import { GetByQueryType, SeachQueryType } from './dto/queries.dto';
 
 @Injectable()
 export class AsteroidsService {
@@ -22,15 +24,11 @@ export class AsteroidsService {
     return result.length
   }
 
-  async findAll(params: {
-    where?: Prisma.AsteroidsWhereInput;
-    orderBy?: Prisma.AsteroidsOrderByWithRelationInput;
-  }): Promise<Asteroids[]> {
-    const { where, orderBy } = params;
-    return this.prisma.asteroids.findMany({
-      where,
-      orderBy,
-    });
+  async findAll(searchParams: GetByQueryType): Promise<Asteroids[]> {
+
+    const query: SeachQueryType = getByDateQuery(searchParams)
+
+    return this.prisma.asteroids.findMany(query);
   }
 
   async findOne(
