@@ -1,5 +1,5 @@
-import { Injectable } from '@nestjs/common';
-import { CreateFavoriteDto } from './dto/create-favorite.dto';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { FavoriteDto } from './dto/create-favorite.dto';
 import { PrismaService } from 'lib/common/database/prisma.service';
 
 @Injectable()
@@ -9,15 +9,30 @@ export class FavoritesService {
     private prisma: PrismaService,
   ) { }
 
-  async add(createFavoriteDto: CreateFavoriteDto) {
-    return 'This action adds a new favorite';
+  async add(favoriteDto: FavoriteDto) {
+    const asteroid = await this.findOne(favoriteDto.asteroid_id, favoriteDto.user_id)
+    if (asteroid) throw new HttpException('This asteroid already exist for user favorites', HttpStatus.NOT_FOUND)
+
+    return await this.prisma.favorites.create({
+      data: favoriteDto,
+    })
   }
 
-  async findAll() {
-    return `This action returns all favorites`;
+  async findAll(): Promise<FavoriteDto[]> {
+    return this.prisma.favorites.findMany();
   }
 
-  async remove(id: number) {
-    return `This action removes a #${id} favorite`;
+  async findOne(asteroid_id: number, user_id: number): Promise<FavoriteDto> {
+    return this.prisma.favorites.findFirst({
+      where: { user_id: Number(user_id), asteroid_id: Number(asteroid_id), }
+    });
+  }
+
+  async remove({ asteroid_id, user_id }: FavoriteDto): Promise<FavoriteDto> {
+
+    const asteroid = await this.findOne(asteroid_id, user_id)
+    if (!asteroid) throw new HttpException('User asteroid not found', HttpStatus.NOT_FOUND)
+
+    return this.prisma.favorites.delete({ where: { id: Number(asteroid.id) } });
   }
 }

@@ -1,5 +1,5 @@
-export type CreateFavoriteDto = {
-    id: number;
+export type FavoriteDto = {
+    id?: number;
     user_id: number;
     asteroid_id: number;
 }
