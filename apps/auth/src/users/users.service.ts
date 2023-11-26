@@ -62,7 +62,10 @@ export class UserService {
     const token = this.jwtService.sign(payload)
 
     const data = {
-      user: findUser,
+      user: {
+        name: findUser.name,
+        email: findUser.email,
+      },
       token
     }
 

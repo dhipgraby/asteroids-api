@@ -6,11 +6,11 @@ import { JwtAuthGuard } from 'lib/common/auth/jwt-auth.guard';
 
 @ApiBearerAuth()
 @ApiTags('favorites')
+@UseGuards(JwtAuthGuard)
 @Controller('favorites')
 export class FavoritesController {
   constructor(private readonly favoritesService: FavoritesService) { }
 
-  @UseGuards(JwtAuthGuard)
   @Post('add')
   create(@Request() req, @Body() body: { id: number }) {
 
@@ -27,7 +27,6 @@ export class FavoritesController {
     return this.favoritesService.findAll();
   }
 
-  @UseGuards(JwtAuthGuard)
   @Delete(':id')
   remove(@Request() req, @Param('id') asteroid_id: number) {
     const user_id = req.user.id

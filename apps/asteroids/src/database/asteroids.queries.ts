@@ -27,9 +27,6 @@ export const getByDateQuery = ({ start_date, end_date, orderBy }: GetByQueryType
         },
     };
 
-    console.log("where", where);
-
-
     return {
         where: where,
         orderBy: order
