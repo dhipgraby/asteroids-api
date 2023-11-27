@@ -1,12 +1,12 @@
 import { HttpException, } from '@nestjs/common/exceptions';
 import { HttpStatus } from '@nestjs/common/enums';
 import { Injectable } from '@nestjs/common';
-import { PrismaService } from '../database/prisma.service';
 import { User, Prisma } from '@prisma/client';
 import { CreateUserDto } from './dto/create-user.dto';
 import { LoginUserDto } from './dto/login-user.dto';
 import { hash, compare } from 'bcrypt'
 import { JwtService } from '@nestjs/jwt';
+import { PrismaService } from 'lib/common/database/prisma.service';
 
 @Injectable()
 export class UserService {
@@ -15,7 +15,7 @@ export class UserService {
     private jwtService: JwtService
   ) { }
 
-  async signup(userObject: CreateUserDto): Promise<User> {
+  async signup(userObject: CreateUserDto) {
     const { password, email, name } = userObject;
 
     const existingUser = await this.findAll({
@@ -39,9 +39,17 @@ export class UserService {
     userObject = { ...userObject, password: plainToHash };
 
     try {
-      return this.prisma.user.create({
+      const newUser = await this.prisma.user.create({
         data: userObject,
       });
+
+      if (newUser) {
+        return {
+          status: 200,
+          message: "New user created"
+        }
+      }
+
     } catch (error) {
       throw new HttpException('Database error', HttpStatus.INTERNAL_SERVER_ERROR);
     }
@@ -50,7 +58,10 @@ export class UserService {
   async login(userLoginObject: LoginUserDto) {
 
     const { email, password } = userLoginObject
-    const findUser = await this.findOne({ email })
+
+    const findUser = await this.prisma.user.findUnique({
+      where: { email },
+    });
 
     if (!findUser) throw new HttpException("USER_NOT_FOUND", HttpStatus.NOT_FOUND)
 
@@ -62,7 +73,10 @@ export class UserService {
     const token = this.jwtService.sign(payload)
 
     const data = {
-      user: findUser,
+      user: {
+        name: findUser.name,
+        email: findUser.email,
+      },
       token
     }
 
@@ -72,10 +86,16 @@ export class UserService {
 
   async findOne(
     userWhereUniqueInput: Prisma.UserWhereUniqueInput,
-  ): Promise<User | null> {
-    return this.prisma.user.findUnique({
+  ) {
+    const user = await this.prisma.user.findUnique({
       where: userWhereUniqueInput,
     });
+    if (!user) throw new HttpException("USER NOT FOUND", HttpStatus.NOT_FOUND)
+    return {
+      name: user.name,
+      email: user.email,
+      status: 200
+    }
   }
 
   async findAll(params: {
