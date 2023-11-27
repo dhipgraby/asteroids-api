@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Body, UseGuards, Request } from '@nestjs/common';
 import { UserService } from './users.service';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -24,9 +24,10 @@ export class UsersController {
   }
 
   @UseGuards(JwtAuthGuard)
-  @Get('getAll')
-  findAll() {
-    return this.usersService.findAll({});
+  @Get('user')
+  findAll(@Request() req) {
+    const user_id = req.user.id
+    return this.usersService.findOne({ id: Number(user_id) });
   }
 
   // @Get(':id')

@@ -11,15 +11,23 @@ export class FavoritesService {
 
   async add(favoriteDto: FavoriteDto) {
     const asteroid = await this.findOne(favoriteDto.asteroid_id, favoriteDto.user_id)
-    if (asteroid) throw new HttpException('This asteroid already exist for user favorites', HttpStatus.NOT_FOUND)
+    if (asteroid) {
+      return {
+        exist: true
+      }
+    }
 
     return await this.prisma.favorites.create({
       data: favoriteDto,
     })
   }
 
-  async findAll(): Promise<FavoriteDto[]> {
-    return this.prisma.favorites.findMany();
+  async findAll() {
+    return this.prisma.favorites.findMany({
+      select: {
+        asteroid_id: true
+      }
+    });
   }
 
   async findOne(asteroid_id: number, user_id: number): Promise<FavoriteDto> {
