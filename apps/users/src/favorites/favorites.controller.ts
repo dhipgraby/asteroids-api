@@ -19,8 +19,6 @@ export class FavoritesController {
       user_id: req.user.id
     }
 
-    console.log('calling add ', favoriteDto);
-
     return this.favoritesService.add(favoriteDto);
   }
 

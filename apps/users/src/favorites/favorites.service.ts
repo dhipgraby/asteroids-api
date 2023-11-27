@@ -23,11 +23,23 @@ export class FavoritesService {
   }
 
   async findAll() {
-    return this.prisma.favorites.findMany({
+    const userFavorites = await this.prisma.favorites.findMany({
       select: {
         asteroid_id: true
       }
     });
+
+    if (userFavorites.length > 0) {
+      const favorites = await Promise.all(userFavorites.map(async (el) => {
+        const asteroid = await this.prisma.asteroids.findUnique({ where: { id: el.asteroid_id } });
+        asteroid["favorite"] = true
+        return asteroid;
+      }));
+
+      return favorites;
+    } else {
+      return [];
+    }
   }
 
   async findOne(asteroid_id: number, user_id: number): Promise<FavoriteDto> {
@@ -36,11 +48,16 @@ export class FavoritesService {
     });
   }
 
-  async remove({ asteroid_id, user_id }: FavoriteDto): Promise<FavoriteDto> {
+  async remove({ asteroid_id, user_id }: FavoriteDto) {
 
     const asteroid = await this.findOne(asteroid_id, user_id)
     if (!asteroid) throw new HttpException('User asteroid not found', HttpStatus.NOT_FOUND)
 
-    return this.prisma.favorites.delete({ where: { id: Number(asteroid.id) } });
+    const deleted = await this.prisma.favorites.delete({ where: { id: Number(asteroid.id) } });
+    if (deleted.id) {
+      return {
+        deleted: true
+      }
+    }
   }
 }
