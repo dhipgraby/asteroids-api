@@ -57,11 +57,17 @@ export class UserService {
 
   async login(userLoginObject: LoginUserDto) {
 
-    const { email, password } = userLoginObject
+    const { identifyer, password } = userLoginObject
 
-    const findUser = await this.prisma.user.findUnique({
-      where: { email },
+    const findUser = await this.prisma.user.findFirst({
+      where: {
+        OR: [
+          { email: identifyer },
+          { name: identifyer },
+        ]
+      },
     });
+
 
     if (!findUser) throw new HttpException("USER_NOT_FOUND", HttpStatus.NOT_FOUND)
 
