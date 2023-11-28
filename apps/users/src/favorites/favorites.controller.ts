@@ -23,8 +23,9 @@ export class FavoritesController {
   }
 
   @Get()
-  findAll() {
-    return this.favoritesService.findAll();
+  findAll(@Request() req) {
+    const user_id = req.user.id
+    return this.favoritesService.findAll(user_id);
   }
 
   @Delete(':id')

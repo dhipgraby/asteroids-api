@@ -22,8 +22,11 @@ export class FavoritesService {
     })
   }
 
-  async findAll() {
+  async findAll(user_id: number) {
     const userFavorites = await this.prisma.favorites.findMany({
+      where: {
+        user_id
+      },
       select: {
         asteroid_id: true
       }
